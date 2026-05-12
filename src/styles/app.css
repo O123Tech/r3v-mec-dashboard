@@ -2168,6 +2168,27 @@ input[type='number'] { -moz-appearance: textfield; }
   font-size: var(--text-xs);
 }
 
+.mechanic-card__footer-right {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.mechanic-card__flat-rate {
+  color: var(--accent);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.mechanic-flat-rate-cell {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--accent);
+  white-space: nowrap;
+  padding: 0 var(--sp-1);
+}
+
 .mechanic-status {
   display: inline-flex;
   align-items: center;
