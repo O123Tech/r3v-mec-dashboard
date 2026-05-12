@@ -192,6 +192,7 @@ export interface WorkOrderLine {
   quantity: number
   unitPrice: number
   taxable: boolean
+  flatRateHours?: number
 }
 
 export type WorkOrderHoldReason = 'Waiting Parts' | 'Waiting Approval' | 'Waiting Customer' | 'Waiting Payment' | 'Other' | ''
