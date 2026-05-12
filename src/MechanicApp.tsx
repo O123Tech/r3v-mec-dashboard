@@ -93,6 +93,7 @@ function statusTone(status: WorkOrder['status']): string {
 }
 
 export function MechanicApp() {
+  const [isOnline, setIsOnline] = useState(() => navigator.onLine)
   const [prefs, setPrefs] = useState<MechanicPrefs>(() => loadPrefs())
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -106,6 +107,14 @@ export function MechanicApp() {
   const [setupTestMessage, setSetupTestMessage] = useState<string | null>(null)
   const [prefsSaved, setPrefsSaved] = useState(false)
   const isFirstPrefsRender = useRef(true)
+
+  useEffect(() => {
+    const online  = () => setIsOnline(true)
+    const offline = () => setIsOnline(false)
+    window.addEventListener('online',  online)
+    window.addEventListener('offline', offline)
+    return () => { window.removeEventListener('online', online); window.removeEventListener('offline', offline) }
+  }, [])
 
   useEffect(() => {
     if (isFirstPrefsRender.current) { isFirstPrefsRender.current = false; return }
@@ -276,6 +285,12 @@ export function MechanicApp() {
           <Settings size={15} />
         </button>
       </header>
+
+      {!isOnline && (
+        <div className="mechanic-offline-banner">
+          ⚠ No connection — loaded jobs are still available. Saves will fail until you're back online.
+        </div>
+      )}
 
       {settingsOpen && (
         <div className="mechanic-settings" role="dialog" aria-modal="true" aria-label="Mechanic settings">
