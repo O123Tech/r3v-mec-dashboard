@@ -16,7 +16,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-feature-settings: 'kern' 1, 'liga' 1, 'calt' 1;
-  overflow: hidden;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 /* Ambient — instrument panel: red arc cast, deep cool void, low-key grain */
@@ -2337,15 +2338,19 @@ input[type='number'] { -moz-appearance: textfield; }
 }
 
 @media (max-width: 900px) {
+  html {
+    height: -webkit-fill-available;
+  }
+
   body {
     overflow-y: auto;
     overflow-x: hidden;
-    height: -webkit-fill-available;
+    min-height: -webkit-fill-available;
   }
 
   .mechanic-app {
     padding: var(--sp-3);
-    min-height: -webkit-fill-available;
+    min-height: unset;
     overflow-y: visible;
   }
 
