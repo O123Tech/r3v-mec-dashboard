@@ -2340,20 +2340,23 @@ input[type='number'] { -moz-appearance: textfield; }
 }
 
 @media (max-width: 900px) {
-  html {
-    height: -webkit-fill-available;
+  html, body {
+    height: 100%;
+    overflow-x: hidden;
   }
 
   body {
     overflow-y: auto;
-    overflow-x: hidden;
-    min-height: -webkit-fill-available;
   }
 
   .mechanic-app {
-    padding: var(--sp-3);
-    min-height: unset;
+    min-height: 100%;
     overflow-y: visible;
+    /* Respect iPhone notch, status bar, and Safari bottom bar */
+    padding-top: max(var(--sp-4), env(safe-area-inset-top));
+    padding-bottom: max(80px, env(safe-area-inset-bottom));
+    padding-left: max(var(--sp-3), env(safe-area-inset-left));
+    padding-right: max(var(--sp-3), env(safe-area-inset-right));
   }
 
   /* Prevent iOS auto-zoom on focus — inputs must be >= 16px */
@@ -2378,8 +2381,19 @@ input[type='number'] { -moz-appearance: textfield; }
     grid-template-columns: 1fr;
   }
 
+  .mechanic-header h1 {
+    font-size: var(--text-lg);
+  }
+
   .mechanic-detail {
     overflow-y: visible;
+  }
+
+  /* Solid panel backgrounds — stop ambient gradient bleeding through */
+  .mechanic-list,
+  .mechanic-detail,
+  .panel {
+    background: var(--surface);
   }
 
   .mechanic-detail .tbl-wrap {
