@@ -59,6 +59,8 @@ body::after {
 button, input, select, textarea {
   font: inherit;
   color: inherit;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* ─── App shell ──────────────────────────────────────────────────────────── */
@@ -2354,6 +2356,11 @@ input[type='number'] { -moz-appearance: textfield; }
     overflow-y: visible;
   }
 
+  /* Prevent iOS auto-zoom on focus — inputs must be >= 16px */
+  input, select, textarea {
+    font-size: 16px !important;
+  }
+
   .mechanic-header,
   .mechanic-connect,
   .mechanic-detail__header,
@@ -2369,6 +2376,10 @@ input[type='number'] { -moz-appearance: textfield; }
   .mechanic-quick-actions,
   .mechanic-shell {
     grid-template-columns: 1fr;
+  }
+
+  .mechanic-detail {
+    overflow-y: visible;
   }
 
   .mechanic-detail .tbl-wrap {
