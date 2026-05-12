@@ -425,7 +425,10 @@ export function MechanicApp() {
                 <p className="mechanic-card__desc">{wo.customerConcern || wo.diagnostics || 'No concern entered yet.'}</p>
                 <div className="mechanic-card__footer">
                   <span>{wo.assignedMechanic?.trim() ? `Assigned: ${wo.assignedMechanic}` : 'Unassigned'}</span>
-                  <span>{wo.dateOpened}</span>
+                  <span className="mechanic-card__footer-right">
+                    {(() => { const total = (wo.servicePerformed || []).reduce((s, l) => s + (l.flatRateHours || 0), 0); return total > 0 ? <span className="mechanic-card__flat-rate">⏱ {total} hrs</span> : null })()}
+                    <span>{wo.dateOpened}</span>
+                  </span>
                 </div>
               </button>
             ))}
@@ -544,16 +547,18 @@ export function MechanicApp() {
                     <thead>
                       <tr>
                         <th>Description</th>
-                        <th style={{ width: 88 }}>Hours</th>
+                        <th style={{ width: 80 }}>Book Time</th>
+                        <th style={{ width: 72 }}>Hours</th>
                         <th style={{ width: 44 }}></th>
                       </tr>
                     </thead>
                     <tbody>
                       {selected.servicePerformed.length === 0 ? (
-                        <tr><td colSpan={3} className="mechanic-table-empty">No service lines yet.</td></tr>
+                        <tr><td colSpan={4} className="mechanic-table-empty">No service lines yet.</td></tr>
                       ) : selected.servicePerformed.map(line => (
                         <tr key={line.id}>
                           <td><input className="tbl-input" value={line.description} onChange={e => updateServiceLine(line.id, { description: e.target.value })} /></td>
+                          <td><span className="mechanic-flat-rate-cell">{line.flatRateHours ? `${line.flatRateHours} hrs` : '—'}</span></td>
                           <td><input className="tbl-input" type="number" min="0" step="0.1" value={line.quantity || ''} onFocus={e => e.currentTarget.select()} onChange={e => updateServiceLine(line.id, { quantity: Number(e.target.value) || 0 })} /></td>
                           <td><button className="btn btn--icon btn--danger btn--sm" onClick={() => removeServiceLine(line.id)}>x</button></td>
                         </tr>
