@@ -107,6 +107,10 @@ export function MechanicApp() {
   const [setupTestMessage, setSetupTestMessage] = useState<string | null>(null)
   const [prefsSaved, setPrefsSaved] = useState(false)
   const isFirstPrefsRender = useRef(true)
+  // Local input buffers — prevent iOS re-render from clearing typed text
+  const [localAssigned, setLocalAssigned] = useState('')
+  const [localDiagnostics, setLocalDiagnostics] = useState('')
+  const [localMechanicNotes, setLocalMechanicNotes] = useState('')
 
   useEffect(() => {
     const online  = () => setIsOnline(true)
@@ -194,6 +198,12 @@ export function MechanicApp() {
 
   const selected = workOrders.find(wo => wo.id === selectedId) ?? null
   const hasUnsavedChanges = selected ? dirtyIds.has(selected.id) : false
+
+  useEffect(() => {
+    setLocalAssigned(selected?.assignedMechanic ?? '')
+    setLocalDiagnostics(selected?.diagnostics ?? '')
+    setLocalMechanicNotes(selected?.mechanicNotes ?? '')
+  }, [selectedId])
 
   function patchSelected(patch: Partial<WorkOrder>) {
     if (!selected) return
@@ -457,8 +467,9 @@ export function MechanicApp() {
                   <div className="mechanic-assigned">
                     <input
                       className="field__input"
-                      value={selected.assignedMechanic ?? ''}
-                      onChange={e => patchSelected({ assignedMechanic: e.target.value })}
+                      value={localAssigned}
+                      onChange={e => setLocalAssigned(e.target.value)}
+                      onBlur={() => patchSelected({ assignedMechanic: localAssigned })}
                       placeholder="Mechanic name"
                     />
                     {prefs.mechanicName.trim() && selected.assignedMechanic?.trim() !== prefs.mechanicName.trim() && (
@@ -515,12 +526,12 @@ export function MechanicApp() {
 
               <section className="wo-section">
                 <h3>Diagnostics</h3>
-                <textarea className="field__input wo-textarea mechanic-textarea" value={selected.diagnostics} onChange={e => patchSelected({ diagnostics: e.target.value })} />
+                <textarea className="field__input wo-textarea mechanic-textarea" value={localDiagnostics} onChange={e => setLocalDiagnostics(e.target.value)} onBlur={() => patchSelected({ diagnostics: localDiagnostics })} />
               </section>
 
               <section className="wo-section">
                 <h3>Mechanic Notes</h3>
-                <textarea className="field__input wo-textarea mechanic-textarea" value={selected.mechanicNotes ?? ''} onChange={e => patchSelected({ mechanicNotes: e.target.value, internalNotes: e.target.value })} />
+                <textarea className="field__input wo-textarea mechanic-textarea" value={localMechanicNotes} onChange={e => setLocalMechanicNotes(e.target.value)} onBlur={() => patchSelected({ mechanicNotes: localMechanicNotes, internalNotes: localMechanicNotes })} />
               </section>
 
               <section className="wo-section">
