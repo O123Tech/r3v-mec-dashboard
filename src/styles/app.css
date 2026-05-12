@@ -1996,6 +1996,17 @@ input[type='number'] { -moz-appearance: textfield; }
   opacity: 1;
 }
 
+.mechanic-offline-banner {
+  background: rgba(217,119,6,0.15);
+  border: 1px solid rgba(217,119,6,0.30);
+  color: var(--warning-text);
+  border-radius: var(--r-md);
+  padding: var(--sp-3) var(--sp-4);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-align: center;
+}
+
 .mechanic-floating-setup {
   position: fixed;
   right: max(var(--sp-4), env(safe-area-inset-right));
@@ -2102,9 +2113,17 @@ input[type='number'] { -moz-appearance: textfield; }
   cursor: pointer;
   text-align: left;
   transition: border-color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease), background var(--dur-fast) var(--ease);
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
 }
 
-.mechanic-card:hover,
+@media (hover: hover) {
+  .mechanic-card:hover {
+    border-color: rgba(220,32,32,0.45);
+    background: rgba(220,32,32,0.08);
+  }
+}
+
 .mechanic-card--active {
   border-color: rgba(220,32,32,0.45);
   background: rgba(220,32,32,0.08);
@@ -2319,11 +2338,15 @@ input[type='number'] { -moz-appearance: textfield; }
 
 @media (max-width: 900px) {
   body {
-    overflow: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+    height: -webkit-fill-available;
   }
 
   .mechanic-app {
     padding: var(--sp-3);
+    min-height: -webkit-fill-available;
+    overflow-y: visible;
   }
 
   .mechanic-header,
