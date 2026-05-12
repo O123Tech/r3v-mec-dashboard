@@ -1,0 +1,119 @@
+/*
+  R3V FinDash — Design Tokens v3
+  "Instrument Grade" — precision instrument aesthetic
+  IBM Plex Sans + IBM Plex Mono — technical authority, humanist warmth
+  Type scale: 1.25 modular ratio (Major Third), base 16px
+  8pt spacing grid
+  WCAG AAA target (7:1) on critical text
+*/
+
+:root {
+  /* ── Backgrounds ────────────────────────────────────── */
+  --bg:            #060809;        /* void — cool near-black */
+  --bg-mid:        #080b0f;        /* subtle depth layer */
+
+  /* ── Surfaces — clearly separated from bg ───────────── */
+  --surface:         #0e1318;                   /* +8 lightness — panels are visible */
+  --surface-raised:  #141c24;                   /* modals, popovers */
+  --surface-soft:    rgba(255, 255, 255, 0.04); /* hover ghost */
+  --surface-hover:   rgba(255, 255, 255, 0.06);
+
+  /* ── Borders ────────────────────────────────────────── */
+  --border:          rgba(255, 255, 255, 0.08);
+  --border-strong:   rgba(255, 255, 255, 0.16);
+  --border-red:      rgba(220, 32, 32, 0.45);
+  --border-focus:    rgba(220, 32, 32, 0.65);
+
+  /* ── Text ───────────────────────────────────────────── */
+  --text:     #f0f4f8;    /* warm white — softer than pure #f1f5f9 */
+  --muted:    #64748b;    /* 4.5:1 on --bg */
+  --subtle:   #2d3d4f;    /* decorative only */
+
+  /* ── RED accent ─────────────────────────────────────── */
+  --accent:       #dc2020;
+  --accent-dim:   rgba(220, 32, 32, 0.11);
+  --accent-text:  #ff4545;    /* 5.1:1 on --surface */
+  --accent-glow:  rgba(220, 32, 32, 0.28);
+  --accent-hover: rgba(220, 32, 32, 0.07);
+
+  /* ── Warning: amber ─────────────────────────────────── */
+  --warning:      #d97706;
+  --warning-dim:  rgba(217, 119, 6, 0.12);
+  --warning-text: #fbbf24;    /* 5.4:1 on --bg */
+
+  /* ── Danger = red (same family as accent) ───────────── */
+  --danger:       #dc2020;
+  --danger-dim:   rgba(220, 32, 32, 0.12);
+  --danger-text:  #ff4545;
+
+  /* ── Positive: cash-green ───────────────────────────── */
+  --positive:      #16a34a;
+  --positive-dim:  rgba(34, 197, 94, 0.10);
+  --positive-text: #4ade80;   /* 5.8:1 on --bg */
+
+  /* ── Status aliases ─────────────────────────────────── */
+  --status-Growth:  var(--positive-text);
+  --status-Stable:  var(--accent-text);
+  --status-Tight:   var(--warning-text);
+  --status-Danger:  var(--accent-text);
+
+  /* ── Typography — IBM Plex ──────────────────────────── */
+  --font:      'IBM Plex Sans', -apple-system, BlinkMacSystemFont,
+               'Helvetica Neue', Arial, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'Cascadia Code', 'Consolas',
+               ui-monospace, monospace;
+
+  /* ── Type scale — 1.25 modular ratio ───────────────── */
+  /* Base 16px → ×0.512, ×0.64, ×0.8, ×1, ×1.25, ×1.563, ×1.953, ×2.441 */
+  --text-xs:   0.64rem;   /*  10.2px — labels, badges    */
+  --text-sm:   0.80rem;   /*  12.8px — body, nav items   */
+  --text-base: 1.00rem;   /*  16px   — base body         */
+  --text-md:   1.25rem;   /*  20px   — sub-headings      */
+  --text-lg:   1.563rem;  /*  25px   — panel headings    */
+  --text-xl:   1.953rem;  /*  31px   — section titles    */
+  --text-2xl:  2.441rem;  /*  39px   — KPI values        */
+  --text-hero: clamp(2.5rem, 4vw, 3.5rem); /* FCF hero  */
+
+  /* ── Spacing — 8pt grid ─────────────────────────────── */
+  /* sp-1 = 4px (half-unit for tight micro-gaps)          */
+  --sp-1:  4px;
+  --sp-2:  8px;
+  --sp-3:  12px;
+  --sp-4:  16px;
+  --sp-5:  24px;   /* was 20 → bumped to next 8pt step   */
+  --sp-6:  32px;   /* was 24 → bumped                    */
+  --sp-7:  40px;   /* was 32 → bumped                    */
+  --sp-8:  48px;
+  --sp-10: 64px;
+
+  /* ── Radius ─────────────────────────────────────────── */
+  --r-sm:   4px;
+  --r-md:   8px;
+  --r-lg:   14px;
+  --r-xl:   20px;
+  --r-pill: 999px;
+
+  /* ── Shadows — layered for depth ────────────────────── */
+  --shadow-sm:    0 1px 3px rgba(0,0,0,0.5), 0 1px 2px rgba(0,0,0,0.3);
+  --shadow-md:    0 4px 16px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.3);
+  --shadow-lg:    0 16px 48px rgba(0,0,0,0.6), 0 6px 16px rgba(0,0,0,0.35);
+  --shadow-inset: inset 0 1px 0 rgba(255,255,255,0.055),
+                  inset 0 -1px 0 rgba(0,0,0,0.25);
+  --shadow-red:   0 0 0 1px rgba(220,32,32,0.12),
+                  0 4px 24px rgba(220,32,32,0.15);
+
+  /* ── Transitions ────────────────────────────────────── */
+  --dur-fast: 140ms;
+  --dur-base: 200ms;
+  --dur-slow: 300ms;
+  --ease:     cubic-bezier(0.16, 1, 0.3, 1);   /* snappy spring */
+  --ease-out: cubic-bezier(0.0, 0.0, 0.2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration:        0.01ms !important;
+    animation-iteration-count: 1      !important;
+    transition-duration:       0.01ms !important;
+  }
+}
