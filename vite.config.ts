@@ -9,18 +9,6 @@ export default defineConfig({
       registerType: 'autoUpdate',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
-        // Cache Apps Script requests for offline read — saves fail gracefully
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/script\.google\.com\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'apps-script-cache',
-              networkTimeoutSeconds: 10,
-              cacheableResponse: { statuses: [0, 200] },
-            },
-          },
-        ],
       },
       manifest: {
         name: 'R3V Mechanic Jobs',
@@ -32,14 +20,14 @@ export default defineConfig({
         orientation: 'portrait',
         icons: [
           {
-            src: 'icon-192.svg',
+            src: 'icon-192.png',
             sizes: '192x192',
-            type: 'image/svg+xml',
+            type: 'image/png',
           },
           {
-            src: 'icon-512.svg',
+            src: 'icon-512.png',
             sizes: '512x512',
-            type: 'image/svg+xml',
+            type: 'image/png',
             purpose: 'any maskable',
           },
         ],

@@ -246,6 +246,12 @@ export interface WorkOrder {
   sheetUrl?: string
   pdfUrl?: string
   lastSyncedAt?: string
+  canEdit?: boolean
+  mechanicSignoff?: {
+    mechanicId: string
+    mechanicName: string
+    signedOffAt: string
+  } | null
 }
 
 // ─── Customers ───────────────────────────────────────────────────────────────
