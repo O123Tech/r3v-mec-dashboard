@@ -2195,6 +2195,17 @@ input[type='number'] { -moz-appearance: textfield; }
   background: rgba(220,32,32,0.08);
 }
 
+.mechanic-list__controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--sp-2);
+}
+
+.mechanic-list__controls .field__input {
+  min-height: 44px;
+  font-variant-numeric: tabular-nums;
+}
+
 .mechanic-card:focus-visible,
 .mechanic-search:focus-within {
   outline: 2px solid var(--accent-text);

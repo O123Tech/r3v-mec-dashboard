@@ -24,6 +24,7 @@ import {
   type MechanicProfile,
 } from './integrations/workOrders'
 import { normalizePairingCode } from './access/pairing'
+import { sortMechanicWorkOrders, type MechanicSortMode } from './jobs/sortWorkOrders'
 
 type MechanicFilter = 'mine' | 'unassigned' | 'open' | 'complete'
 type MobileView = 'list' | 'detail'
@@ -32,6 +33,7 @@ interface MechanicPrefs {
   scriptUrl: string
   mechanicName: string
   filter: MechanicFilter
+  sort: MechanicSortMode
 }
 
 const PREFS_KEY = 'r3v_mechanic_app_prefs'
@@ -47,15 +49,16 @@ function uid(): string {
 function loadPrefs(): MechanicPrefs {
   try {
     const raw = localStorage.getItem(PREFS_KEY)
-    if (!raw) return { scriptUrl: '', mechanicName: '', filter: 'open' }
+    if (!raw) return { scriptUrl: '', mechanicName: '', filter: 'open', sort: 'priority' }
     const parsed = JSON.parse(raw) as Partial<MechanicPrefs>
     return {
       scriptUrl: parsed.scriptUrl ?? '',
       mechanicName: parsed.mechanicName ?? '',
       filter: parsed.filter ?? 'mine',
+      sort: parsed.sort ?? 'priority',
     }
   } catch {
-    return { scriptUrl: '', mechanicName: '', filter: 'mine' }
+    return { scriptUrl: '', mechanicName: '', filter: 'mine', sort: 'priority' }
   }
 }
 
@@ -113,26 +116,6 @@ function blankPartNeeded(): WorkOrderPartNeeded {
 
 function blankServiceLine(): WorkOrderLine {
   return { id: uid(), description: '', quantity: 1, unitPrice: 0, taxable: true }
-}
-
-function sortWorkOrders(workOrders: Array<Omit<WorkOrder, 'id'>>): Array<Omit<WorkOrder, 'id'>> {
-  const statusOrder: Record<WorkOrder['status'], number> = {
-    Today: 0,
-    Active: 1,
-    'In Progress': 2,
-    'On Hold': 3,
-    Draft: 4,
-    Ready: 5,
-    Complete: 6,
-    Cancelled: 7,
-    Archived: 8,
-  }
-
-  return [...workOrders].sort((a, b) => {
-    const statusDelta = (statusOrder[a.status] ?? 99) - (statusOrder[b.status] ?? 99)
-    if (statusDelta !== 0) return statusDelta
-    return `${b.dateOpened ?? ''}`.localeCompare(a.dateOpened ?? '')
-  })
 }
 
 function isOpenWorkOrder(wo: WorkOrder): boolean {
@@ -202,8 +185,7 @@ export function MechanicApp() {
     setMessage(null)
     try {
       const result = await fetchMechanicWorkOrders(activeScriptUrl, activeSessionToken)
-      const fetched = sortWorkOrders(result.workOrders)
-        .map((wo, index) => ({
+      const fetched = result.workOrders.map((wo, index) => ({
           ...wo,
           id: wo.sheetUrl || wo.workOrderNumber || `${wo.vehicleVin || 'wo'}-${index}`,
           assignedMechanic: wo.assignedMechanic ?? '',
@@ -222,7 +204,10 @@ export function MechanicApp() {
       const requestedId = initialActivation.requestedJob
         ? fetched.find(wo => wo.workOrderNumber === initialActivation.requestedJob)?.id
         : null
-      const nextVisible = filteredWorkOrdersFor(fetched, { ...prefs, mechanicName: result.mechanic.name }, search)[0]?.id ?? fetched[0]?.id ?? null
+      const nextVisible = sortMechanicWorkOrders(
+        filteredWorkOrdersFor(fetched, { ...prefs, mechanicName: result.mechanic.name }, search),
+        prefs.sort,
+      )[0]?.id ?? fetched[0]?.id ?? null
       setSelectedId(preferredId ?? requestedId ?? nextVisible)
       if (requestedId) setMobileView('detail')
       setMessage(
@@ -281,7 +266,7 @@ export function MechanicApp() {
   }, [])
 
   const visibleWorkOrders = useMemo(
-    () => filteredWorkOrdersFor(workOrders, prefs, search),
+    () => sortMechanicWorkOrders(filteredWorkOrdersFor(workOrders, prefs, search), prefs.sort),
     [workOrders, prefs, search],
   )
 
@@ -533,14 +518,24 @@ export function MechanicApp() {
                 {loading ? <Loader2 size={15} className="spin" aria-hidden="true" /> : <RefreshCw size={15} aria-hidden="true" />}
               </button>
             </div>
-            <div>
-              <label className="wo-label" htmlFor="mechanic-job-view">View</label>
-              <select id="mechanic-job-view" className="field__input field__select" value={prefs.filter} onChange={e => setPrefs(current => ({ ...current, filter: e.target.value as MechanicFilter }))}>
-                <option value="mine">My jobs</option>
-                {permissions.canViewAllJobs && <option value="unassigned">Unassigned</option>}
-                {permissions.canViewAllJobs && <option value="open">All open</option>}
-                <option value="complete">Completed</option>
-              </select>
+            <div className="mechanic-list__controls">
+              <div>
+                <label className="wo-label" htmlFor="mechanic-job-view">View</label>
+                <select id="mechanic-job-view" className="field__input field__select" value={prefs.filter} onChange={e => setPrefs(current => ({ ...current, filter: e.target.value as MechanicFilter }))}>
+                  <option value="mine">My jobs</option>
+                  {permissions.canViewAllJobs && <option value="unassigned">Unassigned</option>}
+                  {permissions.canViewAllJobs && <option value="open">All open</option>}
+                  <option value="complete">Completed</option>
+                </select>
+              </div>
+              <div>
+                <label className="wo-label" htmlFor="mechanic-job-sort">Sort</label>
+                <select id="mechanic-job-sort" className="field__input field__select" value={prefs.sort} onChange={e => setPrefs(current => ({ ...current, sort: e.target.value as MechanicSortMode }))}>
+                  <option value="priority">Priority</option>
+                  <option value="newest">Newest</option>
+                  <option value="workOrder">Work order #</option>
+                </select>
+              </div>
             </div>
             <div className="mechanic-search">
               <Search size={16} aria-hidden="true" />
