@@ -39,7 +39,7 @@ interface MechanicPrefs {
 const PREFS_KEY = 'r3v_mechanic_app_prefs'
 const ACCESS_KEY = 'r3v_mechanic_device_access'
 const DEFAULT_SCRIPT_URL = (import.meta.env.VITE_APPS_SCRIPT_URL ?? '').trim()
-const MECHANIC_STATUSES: WorkOrder['status'][] = ['Today', 'Active', 'In Progress', 'On Hold']
+const MECHANIC_STATUSES: WorkOrder['status'][] = ['Today', 'Active', 'In Progress', 'Ready', 'On Hold']
 const HOLD_REASONS: WorkOrderHoldReason[] = ['', 'Waiting Parts', 'Waiting Approval', 'Waiting Customer', 'Waiting Payment', 'Other']
 
 function uid(): string {
