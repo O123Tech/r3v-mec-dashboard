@@ -16,12 +16,14 @@ import type { WorkOrder, WorkOrderHoldReason, WorkOrderLine, WorkOrderPartNeeded
 import { PARTS_ORDER_STATUSES, PARTS_STORES } from './data/canonicalLabels'
 import {
   activateMechanicInvite,
+  activateMechanicPairingCode,
   fetchMechanicWorkOrders,
   saveMechanicWorkOrder,
   signOffMechanicWorkOrder,
   type MechanicPermissions,
   type MechanicProfile,
 } from './integrations/workOrders'
+import { normalizePairingCode } from './access/pairing'
 
 type MechanicFilter = 'mine' | 'unassigned' | 'open' | 'complete'
 type MobileView = 'list' | 'detail'
@@ -154,6 +156,7 @@ export function MechanicApp() {
   const [mechanic, setMechanic] = useState<MechanicProfile | null>(() => initialAccess?.mechanic ?? null)
   const [permissions, setPermissions] = useState<MechanicPermissions>(() => initialAccess?.permissions ?? { canViewAllJobs: false, canEditAllJobs: false })
   const [activationName, setActivationName] = useState('')
+  const [pairingCode, setPairingCode] = useState('')
   const [activating, setActivating] = useState(false)
   const [workOrders, setWorkOrders] = useState<WorkOrder[]>([])
   const [selectedId, setSelectedId] = useState<string | null>(null)
@@ -236,18 +239,24 @@ export function MechanicApp() {
 
   async function activateDevice() {
     const endpoint = scriptUrl.trim()
-    if (!initialActivation.inviteToken || !isValidAppsScriptUrl(endpoint)) {
-      setError('This activation link is incomplete. Ask the owner for a new invite.')
+    if (!isValidAppsScriptUrl(endpoint)) {
+      setError('Device activation is not configured yet. Ask the owner to finish the mechanic app setup.')
       return
     }
     if (!activationName.trim()) {
       setError('Enter your mechanic name exactly as it appears on the invitation.')
       return
     }
+    if (!initialActivation.inviteToken && normalizePairingCode(pairingCode).length !== 9) {
+      setError('Enter the 8-character pairing code from the owner.')
+      return
+    }
     setActivating(true)
     setError(null)
     try {
-      const result = await activateMechanicInvite(endpoint, initialActivation.inviteToken, activationName.trim())
+      const result = initialActivation.inviteToken
+        ? await activateMechanicInvite(endpoint, initialActivation.inviteToken, activationName.trim())
+        : await activateMechanicPairingCode(endpoint, normalizePairingCode(pairingCode), activationName.trim())
       const access = { scriptUrl: endpoint, ...result }
       saveStoredAccess(access)
       setSessionToken(result.sessionToken)
@@ -475,19 +484,31 @@ export function MechanicApp() {
           <div className="mechanic-activation__icon"><ShieldCheck size={22} aria-hidden="true" /></div>
           <p className="panel__eyebrow">Employee activation</p>
           <h2 id="mechanic-activation-title">Activate this device</h2>
-          <p>Open the one-time invite from the owner, then enter your name exactly as assigned. You will not need an Apps Script URL.</p>
-          {initialActivation.inviteToken ? (
-            <form onSubmit={event => { event.preventDefault(); void activateDevice() }}>
-              <label className="wo-label" htmlFor="activation-mechanic-name">Mechanic name</label>
-              <input id="activation-mechanic-name" className="field__input" value={activationName} onChange={event => setActivationName(event.target.value)} autoComplete="name" autoFocus />
-              <button className="btn btn--primary" type="submit" disabled={activating || !activationName.trim()}>
-                {activating ? <Loader2 size={16} className="spin" aria-hidden="true" /> : <ShieldCheck size={16} aria-hidden="true" />}
-                {activating ? 'Activating' : 'Activate device'}
-              </button>
-            </form>
-          ) : (
-            <p className="mechanic-note mechanic-note--warn">This device needs a current owner-issued activation link.</p>
-          )}
+          <p>{initialActivation.inviteToken ? 'Enter your name exactly as assigned.' : 'Enter your name and the one-time pairing code from the owner. This keeps the installed app signed in on this device.'}</p>
+          <form onSubmit={event => { event.preventDefault(); void activateDevice() }}>
+            <label className="wo-label" htmlFor="activation-mechanic-name">Mechanic name</label>
+            <input id="activation-mechanic-name" className="field__input" value={activationName} onChange={event => setActivationName(event.target.value)} autoComplete="name" autoFocus />
+            {!initialActivation.inviteToken && (
+              <>
+                <label className="wo-label" htmlFor="activation-pairing-code">Pairing code</label>
+                <input
+                  id="activation-pairing-code"
+                  className="field__input mechanic-pairing-code"
+                  value={pairingCode}
+                  onChange={event => setPairingCode(normalizePairingCode(event.target.value))}
+                  placeholder="ABCD-2E9F"
+                  autoCapitalize="characters"
+                  autoComplete="one-time-code"
+                  spellCheck={false}
+                  maxLength={9}
+                />
+              </>
+            )}
+            <button className="btn btn--primary" type="submit" disabled={activating || !activationName.trim() || (!initialActivation.inviteToken && normalizePairingCode(pairingCode).length !== 9)}>
+              {activating ? <Loader2 size={16} className="spin" aria-hidden="true" /> : <ShieldCheck size={16} aria-hidden="true" />}
+              {activating ? 'Activating' : 'Activate device'}
+            </button>
+          </form>
           {error && <p className="mechanic-note mechanic-note--warn" role="alert">{error}</p>}
         </section>
       )}

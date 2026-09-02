@@ -1966,6 +1966,14 @@ input[type='number'] { -moz-appearance: textfield; }
   justify-content: center;
 }
 
+.mechanic-pairing-code {
+  font-family: var(--font-mono);
+  font-size: 1.15rem;
+  font-weight: 750;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
 .mechanic-activation__icon {
   width: 44px;
   height: 44px;

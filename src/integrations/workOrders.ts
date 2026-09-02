@@ -35,9 +35,10 @@ export interface WorkOrderListResult {
 }
 
 export interface WorkOrderPayload {
-  _action: 'activateMechanicInvite' | 'listMechanicWorkOrders' | 'saveMechanicWorkOrder' | 'signOffMechanicWorkOrder'
+  _action: 'activateMechanicInvite' | 'activateMechanicPairingCode' | 'listMechanicWorkOrders' | 'saveMechanicWorkOrder' | 'signOffMechanicWorkOrder'
   sessionToken?: string
   inviteToken?: string
+  pairingCode?: string
   mechanicName?: string
   workOrderNumber?: string
   workOrder?: WorkOrder
@@ -147,6 +148,21 @@ export async function activateMechanicInvite(
   const json = await jsonpRequest<MechanicActivationResult>(scriptUrl, {
     _action: 'activateMechanicInvite',
     inviteToken,
+    mechanicName,
+  } satisfies WorkOrderPayload)
+  if (!json.success) throw new Error(json.error ?? 'Could not activate this device.')
+  if (!json.sessionToken || !json.mechanic || !json.permissions) throw new Error('Activation response was incomplete. Ask the owner for a new invite.')
+  return { sessionToken: json.sessionToken, mechanic: json.mechanic, permissions: json.permissions }
+}
+
+export async function activateMechanicPairingCode(
+  scriptUrl: string,
+  pairingCode: string,
+  mechanicName: string,
+): Promise<{ sessionToken: string; mechanic: MechanicProfile; permissions: MechanicPermissions }> {
+  const json = await jsonpRequest<MechanicActivationResult>(scriptUrl, {
+    _action: 'activateMechanicPairingCode',
+    pairingCode,
     mechanicName,
   } satisfies WorkOrderPayload)
   if (!json.success) throw new Error(json.error ?? 'Could not activate this device.')
